@@ -199,16 +199,17 @@
         const [year, month, day] = fechaInput.split('-');
         const fechaFormateada = `${day}/${month}/${year}`;
 
-        const datos = {
-            accion: accion,
-            fila: filaId,
-            destino: document.getElementById('destino').value,
-            fecha: fechaFormateada,
-            descripcion: document.getElementById('descripcion').value,
-            costos: parseFloat(document.getElementById('costos').value),
-            margen: parseFloat(document.getElementById('margen').value) / 100, // Se guarda como decimal (ej: 0.2) para que Sheets lo pinte como 20%
-            cobro: parseFloat(document.getElementById('cobro').value)
-        };
+const datos = {
+    pestaña: 'PRESUPUESTOS', // <--- Clave para no borrar nada
+    accion: accion,
+    fila: filaId,
+    destino: document.getElementById('destino').value,
+    fecha: fechaFormateada,
+    descripcion: document.getElementById('descripcion').value,
+    costos: parseFloat(document.getElementById('costos').value),
+    margen: parseFloat(document.getElementById('margen').value) / 100,
+    cobro: parseFloat(document.getElementById('cobro').value)
+};
 
         try {
             // Envío vía POST plano para evitar bloqueos estrictos de CORS con Apps Script
