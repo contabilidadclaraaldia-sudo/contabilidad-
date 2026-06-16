@@ -171,7 +171,7 @@
         document.getElementById('fecha_registro').value = hoy;
     });
 
-    // Evento Registrar / Editar Cliente (Sin desencadenar OPTIONS)
+    // Evento Registrar / Editar Cliente
     document.getElementById('clientesForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         mostrarMensaje('Sincronizando información de cliente...', '#ffc107', true);
@@ -183,7 +183,6 @@
         const [year, month, day] = fechaInput.split('-');
         const fechaFormateada = `${day}/${month}/${year}`;
 
-        // Pasamos los parámetros usando URLSearchParams para evadir el Preflight CORS
         const cuerpoDatos = new URLSearchParams();
         cuerpoDatos.append('pestaña', 'BASE DE DATOS');
         cuerpoDatos.append('accion', accion);
@@ -326,7 +325,7 @@
 
             if (res.status === 'success') {
                 if (res.filas.length === 0) {
-                    mostrarMensajeReporte('No se hallaron coincidencia para el nombre indicado.', '#5f6368');
+                    mostrarMensajeReporte('No se hallaron coincidencias para el nombre indicado.', '#5f6368');
                     document.getElementById('contenedorTablaReporte').style.display = 'none';
                     document.getElementById('btnImprimirPDF').style.display = 'none';
                     return;
@@ -368,15 +367,22 @@
         }
     }
 
+    // Imprimir o Guardar PDF
     function imprimirReportePDF() {
         if (!ultimoReporteDatos.cabeceras.length) return alert('No hay datos disponibles para imprimir.');
         const ventanaPrint = window.open('', '_blank');
         let tablaHtml = `<table class="print-table"><thead><tr>`;
-        ultimoReporteDatos.cabeceras.forEach(cab => { tablaHtml += `<th>${cab}</th>`; border: 1px solid #004d40; });
+        
+        ultimoReporteDatos.cabeceras.forEach(cab => { 
+            tablaHtml += `<th>${cab}</th>`; 
+        });
+        
         tablaHtml += `</tr></thead><tbody>`;
         ultimoReporteDatos.filas.forEach(fila => {
             tablaHtml += `<tr>`;
-            fila.forEach(celda => { tablaHtml += `<td>${celda !== undefined && celda !== null ? celda : ''}</td>`; });
+            fila.forEach(celda => { 
+                tablaHtml += `<td>${celda !== undefined && celda !== null ? celda : ''}</td>`; 
+            });
             tablaHtml += `</tr>`;
         });
         tablaHtml += `</tbody></table>`;
