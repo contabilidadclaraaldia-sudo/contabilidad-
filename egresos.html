@@ -50,19 +50,9 @@
     <h2>Control Central de Egresos</h2>
 
     <div class="search-section">
-        <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #c5221f;">Búsqueda por Número de Factura</label>
+        <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #c5221f;">Búsqueda Directa por Número de Factura</label>
         <div class="form-group">
             <input type="text" id="buscar_criterio" placeholder="Escribe el No. Factura exacto a consultar...">
-        </div>
-        <div class="row-inline">
-            <div class="form-group">
-                <label for="buscar_fecha_inicio">Fecha Inicial (Opcional):</label>
-                <input type="date" id="buscar_fecha_inicio">
-            </div>
-            <div class="form-group">
-                <label for="buscar_fecha_fin">Fecha Final (Opcional):</label>
-                <input type="date" id="buscar_fecha_fin">
-            </div>
         </div>
         <button type="button" class="btn-search" onclick="buscarEgreso()" style="width:100%; margin-top:5px;">Consultar Egreso</button>
     </div>
@@ -205,8 +195,6 @@
 
     async function buscarEgreso() {
         const criterio = document.getElementById('buscar_criterio').value.trim();
-        const fInicio = document.getElementById('buscar_fecha_inicio').value;
-        const fFin = document.getElementById('buscar_fecha_fin').value;
 
         if (!criterio) return alert('Por favor digite un Número de factura para buscar.');
 
@@ -215,7 +203,7 @@
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({ pestaña: 'EGRESOS', accion: 'buscar', buscar_termino: criterio, fecha_inicio: fInicio, fecha_fin: fFin })
+                body: JSON.stringify({ pestaña: 'EGRESOS', accion: 'buscar', buscar_termino: criterio, fecha_inicio: null, fecha_fin: null })
             });
 
             const res = await response.json();
