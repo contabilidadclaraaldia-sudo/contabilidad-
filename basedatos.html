@@ -6,8 +6,8 @@
     <title>Base de Datos de Clientes</title>
     <style>
         :root {
-            --primary: #1a73e8;
-            --primary-hover: #1557b0;
+            --primary: #00796b; /* Color Teal que combina con el botón del menú */
+            --primary-hover: #004d40;
             --bg: #f8f9fa;
             --card: #ffffff;
             --text: #202124;
@@ -23,7 +23,7 @@
             padding: 30px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12);
         }
         h2 { text-align: center; color: var(--primary); margin-top: 0; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
-        .search-section { background: #e8f0fe; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #d2e3fc; }
+        .search-section { background: #e0f2f1; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #b2dfdb; }
         .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
         label { font-weight: 600; margin-bottom: 5px; color: #3c4043; font-size: 14px; }
         input { padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; }
@@ -32,8 +32,8 @@
         button { flex: 1; padding: 12px; border: none; border-radius: 4px; font-size: 15px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn-save { background-color: var(--primary); color: white; }
         .btn-save:hover { background-color: var(--primary-hover); }
-        .btn-search { background-color: #1a73e8; color: white; }
-        .btn-search:hover { background-color: #1557b0; }
+        .btn-search { background-color: #00796b; color: white; }
+        .btn-search:hover { background-color: #004d40; }
         .btn-delete { background-color: #5f6368; color: white; display: none; }
         .btn-delete:hover { background-color: #45484a; }
         .btn-cancel { background-color: #757575; color: white; display: none; }
@@ -49,7 +49,7 @@
     <h2>Control de Base de Datos de Clientes</h2>
 
     <div class="search-section">
-        <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #1a73e8;">Búsqueda Directa por Teléfono Principal</label>
+        <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #00796b;">Búsqueda Directa por Teléfono Principal</label>
         <div class="form-group">
             <input type="text" id="buscar_criterio" placeholder="Escribe el Teléfono 1 exacto del cliente a consultar...">
         </div>
@@ -129,24 +129,25 @@
         const [year, month, day] = fechaInput.split('-');
         const fechaFormateada = `${day}/${month}/${year}`;
 
-        // El orden de estas variables debe emparejar con el backend o procesarse por llaves de objeto
+        // Estructura de propiedades estandarizada para tu Google Apps Script
         const datos = {
             pestaña: 'BASE DE DATOS',
             accion: accion,
             fila: filaId,
+            fecha: fechaFormateada, 
             fecha_registro: fechaFormateada,
-            nombre_completo: document.getElementById('nombre_completo').value,
-            ciudad: document.getElementById('ciudad').value,
-            direccion: document.getElementById('direccion').value,
-            telefono_1: document.getElementById('telefono_1').value,
-            telefono_2: document.getElementById('telefono_2').value,
-            correo: document.getElementById('correo').value
+            nombre_completo: document.getElementById('nombre_completo').value.trim(),
+            ciudad: document.getElementById('ciudad').value.trim(),
+            direccion: document.getElementById('direccion').value.trim(),
+            telefono_1: document.getElementById('telefono_1').value.trim(),
+            telefono_2: document.getElementById('telefono_2').value.trim(),
+            correo: document.getElementById('correo').value.trim()
         };
 
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'no-cors', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(datos)
             });
@@ -169,24 +170,32 @@
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({ pestaña: 'BASE DE DATOS', accion: 'buscar', buscar_termino: criterio })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    pestaña: 'BASE DE DATOS', 
+                    accion: 'buscar', 
+                    buscar_termino: criterio 
+                })
             });
 
             const res = await response.json();
 
             if (res && res.status === 'found') {
                 document.getElementById('fila_id').value = res.fila;
-                document.getElementById('nombre_completo').value = res.nombre_completo || '';
+                document.getElementById('nombre_completo').value = res.nombre_completo || res.nombre || '';
                 document.getElementById('ciudad').value = res.ciudad || '';
                 document.getElementById('direccion').value = res.direccion || '';
                 document.getElementById('telefono_1').value = res.telefono_1 || '';
                 document.getElementById('telefono_2').value = res.telefono_2 || '';
                 document.getElementById('correo').value = res.correo || '';
 
-                if (res.fecha_registro) {
-                    const partes = res.fecha_registro.split('T')[0].split('/');
+                let fechaRaw = res.fecha_registro || res.fecha;
+                if (fechaRaw) {
+                    const partes = fechaRaw.split('T')[0].split('/');
                     if(partes.length === 3) {
                         document.getElementById('fecha_registro').value = `${partes[2]}-${partes[1].padStart(2,'0')}-${partes[0].padStart(2,'0')}`;
+                    } else if (fechaRaw.includes('-')) {
+                        document.getElementById('fecha_registro').value = fechaRaw.split('T')[0];
                     }
                 }
 
@@ -198,7 +207,8 @@
                 mostrarMensaje('No se encontró ningún cliente registrado con ese teléfono.', '#d93025');
             }
         } catch (error) {
-            mostrarMensaje('Error en motor de búsqueda: ' + error.message, '#d93025');
+            console.error(error);
+            mostrarMensaje('No se pudo procesar la respuesta o el registro no existe.', '#d93025');
         }
     }
 
