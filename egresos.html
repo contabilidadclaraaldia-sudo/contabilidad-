@@ -50,21 +50,21 @@
     <h2>Control Central de Egresos</h2>
 
     <div class="search-section">
-        <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #c5221f;">Búsqueda Inteligente (Factura, Proveedor o Destino) + Rango</label>
+        <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #c5221f;">Búsqueda por Número de Factura</label>
         <div class="form-group">
-            <input type="text" id="buscar_criterio" placeholder="Escribe el No. Factura, NIT, Proveedor o Destino a rastrear...">
+            <input type="text" id="buscar_criterio" placeholder="Escribe el No. Factura exacto a consultar...">
         </div>
         <div class="row-inline">
             <div class="form-group">
-                <label for="buscar_fecha_inicio">Fecha Inicial:</label>
+                <label for="buscar_fecha_inicio">Fecha Inicial (Opcional):</label>
                 <input type="date" id="buscar_fecha_inicio">
             </div>
             <div class="form-group">
-                <label for="buscar_fecha_fin">Fecha Final:</label>
+                <label for="buscar_fecha_fin">Fecha Final (Opcional):</label>
                 <input type="date" id="buscar_fecha_fin">
             </div>
         </div>
-        <button type="button" class="btn-search" onclick="buscarEgreso()" style="width:100%; margin-top:5px;">Consultar Egresos</button>
+        <button type="button" class="btn-search" onclick="buscarEgreso()" style="width:100%; margin-top:5px;">Consultar Egreso</button>
     </div>
 
     <form id="egresosForm">
@@ -144,7 +144,6 @@
 </div>
 
 <script>
-    // PEGA AQUÍ LA URL DE TU SCRIPT CENTRAL DE APPS SCRIPT
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYXLiGKBVqrIGrHJTmz5u6-6t3F8ZhEKsZUj_VZgEhqgOlWQU6rD6zRp4qBFDMXLymjg/exec';
 
     function calcularFlujoEgresos() {
@@ -153,11 +152,9 @@
         const otroEgreso = parseFloat(document.getElementById('otro_egreso').value) || 0;
         const vImpuesto = parseFloat(document.getElementById('valor_impuesto').value) || 0;
 
-        // SUBTOTAL EGRESO = (VALOR UNITARIO * CANTIDAD) - OTRO EGRESO
         const subtotal = (vUnitario * cantidad) - otroEgreso;
         document.getElementById('subtotal').value = subtotal.toFixed(2);
 
-        // TOTAL EGRESO = SUBTOTAL EGRESO + VALOR IMPUESTO
         const total = subtotal + vImpuesto;
         document.getElementById('total_egreso').value = total.toFixed(2);
     }
@@ -207,11 +204,11 @@
     });
 
     async function buscarEgreso() {
-        const criterio = document.getElementById('buscar_criterio').value;
+        const criterio = document.getElementById('buscar_criterio').value.trim();
         const fInicio = document.getElementById('buscar_fecha_inicio').value;
         const fFin = document.getElementById('buscar_fecha_fin').value;
 
-        if (!criterio && !fInicio && !fFin) return alert('Por favor digite un parámetro de texto o un rango de fechas para buscar.');
+        if (!criterio) return alert('Por favor digite un Número de factura para buscar.');
 
         mostrarMensaje('Rastreando base de datos corporativa...', '#1a73e8', true);
 
@@ -250,7 +247,7 @@
                 document.getElementById('btnCancelar').style.display = 'block';
                 mostrarMensaje('Egreso localizado y listo para edición.', '#1aa260');
             } else {
-                mostrarMensaje('No se encontraron registros que cumplan las condiciones.', '#d93025');
+                mostrarMensaje('No se encontraron registros con ese número de factura.', '#d93025');
             }
         } catch (error) {
             mostrarMensaje('Error en motor de búsqueda: ' + error.message, '#d93025');
