@@ -16,6 +16,8 @@
             --color-presupuesto: #1a73e8; /* Azul */
             --color-ingresos: #1aa260;    /* Verde */
             --color-egresos: #d93025;     /* Rojo */
+            --color-informes: #673ab7;    /* Violeta */
+            --color-ejercicio: #e67e22;   /* Naranja/Dorado */
         }
 
         body {
@@ -39,6 +41,7 @@
             box-shadow: 0 4px 16px rgba(0,0,0,0.08);
             text-align: center;
             box-sizing: border-box;
+            margin: 20px;
         }
 
         h1 {
@@ -97,6 +100,14 @@
             background-color: var(--color-egresos);
         }
 
+        .btn-informes {
+            background-color: var(--color-informes);
+        }
+
+        .btn-ejercicio {
+            background-color: var(--color-ejercicio);
+        }
+
         /* Footer discreto */
         .footer-credit {
             margin-top: 35px;
@@ -114,19 +125,24 @@
     <p class="subtitle">Selecciona el módulo contable que deseas operar:</p>
 
     <div class="menu-grid">
-        <!-- BOTÓN 1: PROYECCIÓN DE PRESUPUESTO -->
         <a href="https://contabilidadclaraaldia-sudo.github.io/contabilidad-/index.html" target="_blank" class="menu-btn btn-presupuesto">
             📊 PROYECCIÓN DE PRESUPUESTO
         </a>
 
-        <!-- BOTÓN 2: INGRESOS -->
         <a href="https://contabilidadclaraaldia-sudo.github.io/contabilidad-/ingresos.html" target="_blank" class="menu-btn btn-ingresos">
             💰 REGISTRO DE INGRESOS
         </a>
 
-        <!-- BOTÓN 3: EGRESOS -->
         <a href="https://contabilidadclaraaldia-sudo.github.io/contabilidad-/egresos.html" target="_blank" class="menu-btn btn-egresos">
             📉 REGISTRO DE EGRESOS
+        </a>
+
+        <a href="https://contabilidadclaraaldia-sudo.github.io/contabilidad-/informes.html" target="_blank" class="menu-btn btn-informes">
+            📋 GENERADOR DE INFORMES (PDF)
+        </a>
+
+        <a href="https://contabilidadclaraaldia-sudo.github.io/contabilidad-/ejercicio.html" target="_blank" class="menu-btn btn-ejercicio">
+            ⚖️ RESULTADO DEL EJERCICIO
         </a>
     </div>
 
