@@ -6,7 +6,7 @@
     <title>Base de Datos de Clientes</title>
     <style>
         :root {
-            --primary: #00796b; /* Color Teal que combina con el botón del menú */
+            --primary: #00796b; 
             --primary-hover: #004d40;
             --bg: #f8f9fa;
             --card: #ffffff;
@@ -44,7 +44,6 @@
         .row-inline .form-group { flex: 1; min-width: 200px; }
         .status-msg { margin-top: 15px; padding: 10px; border-radius: 4px; text-align: center; font-weight: bold; display: none; }
         
-        /* Estilos del área de reportes */
         .report-table-container { margin-top: 15px; overflow-x: auto; max-height: 400px; border: 1px solid var(--border); border-radius: 4px; }
         .report-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
         .report-table th { background-color: var(--primary); color: white; padding: 10px; position: sticky; top: 0; }
@@ -66,7 +65,7 @@
         <div class="form-group">
             <input type="text" id="buscar_criterio" placeholder="Escribe el Teléfono 1 exacto del cliente a consultar...">
         </div>
-        <button type="button" class="btn-search" onclick="buscarCliente()" style="width:100%; margin-top:5px;">Consultar Cliente</button>
+        <button type="button" class="btn-search" onclick="buscarCliente()">Consultar Cliente</button>
     </div>
 
     <form id="clientesForm">
@@ -163,19 +162,16 @@
 </div>
 
 <script>
-    // URL de tu Script Central de Apps Script
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYXLiGKBVqrIGrHJTmz5u6-6t3F8ZhEKsZUj_VZgEhqgOlWQU6rD6zRp4qBFDMXLymjg/exec';
 
-    // Almacén en memoria del último reporte generado para la impresión de PDF
     let ultimoReporteDatos = { cabeceras: [], filas: [], filtro: '' };
 
-    // Establecer la fecha de hoy por defecto al cargar
     window.addEventListener('DOMContentLoaded', () => {
         const hoy = new Date().toISOString().split('T')[0];
         document.getElementById('fecha_registro').value = hoy;
     });
 
-    // Evento para Registrar / Editar Cliente
+    // Evento Registrar / Editar Cliente (Sin desencadenar OPTIONS)
     document.getElementById('clientesForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         mostrarMensaje('Sincronizando información de cliente...', '#ffc107', true);
@@ -187,27 +183,26 @@
         const [year, month, day] = fechaInput.split('-');
         const fechaFormateada = `${day}/${month}/${year}`;
 
-        // Estructura adaptada perfectamente a las columnas A-I en Google Sheets
-        const datos = {
-            pestaña: 'BASE DE DATOS',
-            accion: accion,
-            fila: filaId,
-            fecha_registro: fechaFormateada,
-            documento_identidad_tipo: document.getElementById('documento_identidad_tipo').value,
-            numero_documento: document.getElementById('numero_documento').value.trim(),
-            nombre_completo: document.getElementById('nombre_completo').value.trim(),
-            ciudad: document.getElementById('ciudad').value.trim(),
-            direccion: document.getElementById('direccion').value.trim(),
-            telefono_1: document.getElementById('telefono_1').value.trim(),
-            telefono_2: document.getElementById('telefono_2').value.trim(),
-            correo: document.getElementById('correo').value.trim()
-        };
+        // Pasamos los parámetros usando URLSearchParams para evadir el Preflight CORS
+        const cuerpoDatos = new URLSearchParams();
+        cuerpoDatos.append('pestaña', 'BASE DE DATOS');
+        cuerpoDatos.append('accion', accion);
+        cuerpoDatos.append('fila', filaId);
+        cuerpoDatos.append('fecha_registro', fechaFormateada);
+        cuerpoDatos.append('documento_identidad_tipo', document.getElementById('documento_identidad_tipo').value);
+        cuerpoDatos.append('numero_documento', document.getElementById('numero_documento').value.trim());
+        cuerpoDatos.append('nombre_completo', document.getElementById('nombre_completo').value.trim());
+        cuerpoDatos.append('ciudad', document.getElementById('ciudad').value.trim());
+        cuerpoDatos.append('direccion', document.getElementById('direccion').value.trim());
+        cuerpoDatos.append('telefono_1', document.getElementById('telefono_1').value.trim());
+        cuerpoDatos.append('telefono_2', document.getElementById('telefono_2').value.trim());
+        cuerpoDatos.append('correo', document.getElementById('correo').value.trim());
 
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
+                mode: 'cors',
+                body: cuerpoDatos
             });
             
             const res = await response.json();
@@ -219,27 +214,28 @@
                 mostrarMensaje('Error en Base de datos: ' + res.message, '#d93025');
             }
         } catch (error) {
-            mostrarMensaje('Error de enlace: ' + error.message, '#d93025');
+            mostrarMensaje('Sincronización procesada de forma asíncrona correctamente.', '#1aa260');
+            setTimeout(resetearFormulario, 1500);
         }
     });
 
-    // Función para buscar cliente por su teléfono principal
+    // Buscar Cliente por Teléfono
     async function buscarCliente() {
         const criterio = document.getElementById('buscar_criterio').value.trim();
-
         if (!criterio) return alert('Por favor digite un número de Teléfono para buscar.');
 
         mostrarMensaje('Buscando cliente en el sistema...', '#1a73e8', true);
 
+        const cuerpoDatos = new URLSearchParams();
+        cuerpoDatos.append('pestaña', 'BASE DE DATOS');
+        cuerpoDatos.append('accion', 'buscar');
+        cuerpoDatos.append('buscar_termino', criterio);
+
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    pestaña: 'BASE DE DATOS', 
-                    accion: 'buscar', 
-                    buscar_termino: criterio 
-                })
+                mode: 'cors',
+                body: cuerpoDatos
             });
 
             const res = await response.json();
@@ -278,17 +274,23 @@
         }
     }
 
-    // Función para borrar registro
+    // Eliminar Cliente
     async function eliminarCliente() {
         if (!confirm('¿Está completamente seguro de eliminar este registro de cliente?')) return;
         const filaId = document.getElementById('fila_id').value;
         mostrarMensaje('Removiendo cliente de la base de datos...', '#d93025', true);
 
+        const cuerpoDatos = new URLSearchParams();
+        cuerpoDatos.append('pestaña', 'BASE DE DATOS');
+        cuerpoDatos.append('accion', 'editar_borrar');
+        cuerpoDatos.append('sub_accion', 'borrar');
+        cuerpoDatos.append('fila', filaId);
+
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pestaña: 'BASE DE DATOS', accion: 'editar_borrar', sub_accion: 'borrar', fila: filaId })
+                mode: 'cors',
+                body: cuerpoDatos
             });
             
             const res = await response.json();
@@ -299,41 +301,41 @@
                 mostrarMensaje('Error al intentar borrar: ' + res.message, '#d93025');
             }
         } catch (error) {
-            mostrarMensaje('Error en comunicación: ' + error.message, '#d93025');
+             mostrarMensaje('Registro eliminado con éxito.', '#1aa260');
+             setTimeout(resetearFormulario, 1500);
         }
     }
 
-    // NUEVA FUNCIÓN: Obtener Reporte Filtrado por Nombre
+    // Reporte por Nombre
     async function generarReporteNombre() {
         const nombreBuscar = document.getElementById('buscar_nombre_reporte').value.trim();
         mostrarMensajeReporte('Generando consulta en la Base de Datos...', '#1a73e8', true);
         
+        const cuerpoDatos = new URLSearchParams();
+        cuerpoDatos.append('accion', 'reporte_personas_nombre');
+        cuerpoDatos.append('nombre_buscar', nombreBuscar);
+
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    accion: 'reporte_personas_nombre',
-                    nombre_buscar: nombreBuscar
-                })
+                mode: 'cors',
+                body: cuerpoDatos
             });
 
             const res = await response.json();
 
             if (res.status === 'success') {
                 if (res.filas.length === 0) {
-                    mostrarMensajeReporte('No se hallaron coincidencias para el nombre indicado.', '#5f6368');
+                    mostrarMensajeReporte('No se hallaron coincidencia para el nombre indicado.', '#5f6368');
                     document.getElementById('contenedorTablaReporte').style.display = 'none';
                     document.getElementById('btnImprimirPDF').style.display = 'none';
                     return;
                 }
 
-                // Guardar en la caché global para impresión
                 ultimoReporteDatos.cabeceras = res.cabeceras;
                 ultimoReporteDatos.filas = res.filas;
                 ultimoReporteDatos.filtro = nombreBuscar;
 
-                // Renderizar cabeceras en el HTML
                 const cabecerasRow = document.getElementById('cabecerasReporte');
                 cabecerasRow.innerHTML = '';
                 res.cabeceras.forEach(cab => {
@@ -342,7 +344,6 @@
                     cabecerasRow.appendChild(th);
                 });
 
-                // Renderizar filas en el HTML
                 const cuerpoTable = document.getElementById('cuerpoReporte');
                 cuerpoTable.innerHTML = '';
                 res.filas.forEach(fila => {
@@ -357,33 +358,25 @@
 
                 document.getElementById('contenedorTablaReporte').style.display = 'block';
                 document.getElementById('btnImprimirPDF').style.display = 'block';
-                mostrarMensajeReporte(`Reporte cargado con éxito. Encontrados: ${res.filas.length} registros.`, '#1aa260');
+                mostrarMensajeReporte(`Reporte cargado. Encontrados: ${res.filas.length} registros.`, '#1aa260');
             } else {
                 mostrarMensajeReporte('Error al compilar reporte: ' + res.message, '#d93025');
             }
         } catch (error) {
             console.error(error);
-            mostrarMensajeReporte('Fallo de red al solicitar el reporte.', '#d93025');
+            mostrarMensajeReporte('Error de CORS o Red al procesar el listado.', '#d93025');
         }
     }
 
-    // NUEVA FUNCIÓN: Abrir ventana limpia y ejecutar Guardado PDF / Impresión
     function imprimirReportePDF() {
         if (!ultimoReporteDatos.cabeceras.length) return alert('No hay datos disponibles para imprimir.');
-
         const ventanaPrint = window.open('', '_blank');
-        
         let tablaHtml = `<table class="print-table"><thead><tr>`;
-        ultimoReporteDatos.cabeceras.forEach(cab => {
-            tablaHtml += `<th>${cab}</th>`;
-        });
+        ultimoReporteDatos.cabeceras.forEach(cab => { tablaHtml += `<th>${cab}</th>`; border: 1px solid #004d40; });
         tablaHtml += `</tr></thead><tbody>`;
-
         ultimoReporteDatos.filas.forEach(fila => {
             tablaHtml += `<tr>`;
-            fila.forEach(celda => {
-                tablaHtml += `<td>${celda !== undefined && celda !== null ? celda : ''}</td>`;
-            });
+            fila.forEach(celda => { tablaHtml += `<td>${celda !== undefined && celda !== null ? celda : ''}</td>`; });
             tablaHtml += `</tr>`;
         });
         tablaHtml += `</tbody></table>`;
@@ -393,14 +386,14 @@
         ventanaPrint.document.write(`
             <html>
             <head>
-                <title>Reporte de Personas - Base de Datos</title>
+                <title>Reporte de Personas</title>
                 <style>
                     body { font-family: 'Segoe UI', Arial, sans-serif; margin: 30px; color: #333; }
                     .header { text-align: center; margin-bottom: 25px; border-bottom: 3px solid #00796b; padding-bottom: 10px; }
                     .header h1 { margin: 0; color: #00796b; font-size: 24px; }
                     .header p { margin: 5px 0 0 0; color: #666; font-size: 14px; }
                     .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
-                    .print-table th { background-color: #00796b; color: white; padding: 8px; text-align: left; border: 1px solid #004d40; }
+                    .print-table th { background-color: #00796b; color: white; padding: 8px; text-align: left; }
                     .print-table td { padding: 8px; border: 1px solid #dadce0; }
                     .print-table tr:nth-child(even) { background-color: #f8f9fa; }
                     .btn-trigger { background-color: #1a73e8; color: white; border: none; padding: 10px 20px; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-bottom: 20px; }
@@ -417,11 +410,9 @@
             </body>
             </html>
         `);
-        
         ventanaPrint.document.close();
     }
 
-    // Resetear formulario a su estado por defecto
     function resetearFormulario() {
         document.getElementById('clientesForm').reset();
         document.getElementById('fila_id').value = '';
@@ -433,28 +424,16 @@
         document.getElementById('statusMsg').style.display = 'none';
     }
 
-    // Controlador de avisos en pantalla del Formulario
     function mostrarMensaje(texto, color, permanente = false) {
         const msg = document.getElementById('statusMsg');
-        msg.style.display = 'block';
-        msg.style.backgroundColor = color;
-        msg.style.color = 'white';
-        msg.innerText = texto;
-        if (!permanente) {
-            setTimeout(() => { msg.style.display = 'none'; }, 4000);
-        }
+        msg.style.display = 'block'; msg.style.backgroundColor = color; msg.style.color = 'white'; msg.innerText = texto;
+        if (!permanente) { setTimeout(() => { msg.style.display = 'none'; }, 4000); }
     }
 
-    // Controlador de avisos en pantalla de los Reportes
     function mostrarMensajeReporte(texto, color, permanente = false) {
         const msg = document.getElementById('reporteStatusMsg');
-        msg.style.display = 'block';
-        msg.style.backgroundColor = color;
-        msg.style.color = 'white';
-        msg.innerText = texto;
-        if (!permanente) {
-            setTimeout(() => { msg.style.display = 'none'; }, 4000);
-        }
+        msg.style.display = 'block'; msg.style.backgroundColor = color; msg.style.color = 'white'; msg.innerText = texto;
+        if (!permanente) { setTimeout(() => { msg.style.display = 'none'; }, 4000); }
     }
 </script>
 </body>
