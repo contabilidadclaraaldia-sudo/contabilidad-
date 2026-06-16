@@ -252,11 +252,19 @@
 
                 let fechaRaw = res.fecha_registro;
                 if (fechaRaw) {
-                    const partes = fechaRaw.split('T')[0].split('/');
-                    if(partes.length === 3) {
-                        document.getElementById('fecha_registro').value = `${partes[2]}-${partes[1].padStart(2,'0')}-${partes[0].padStart(2,'0')}`;
-                    } else if (fechaRaw.includes('-')) {
-                        document.getElementById('fecha_registro').value = fechaRaw.split('T')[0];
+                    let fechaLimpia = fechaRaw.split('T')[0];
+                    if (fechaLimpia.includes('/')) {
+                        const partes = fechaLimpia.split('/');
+                        if(partes.length === 3) {
+                            document.getElementById('fecha_registro').value = `${partes[2]}-${partes[1].padStart(2,'0')}-${partes[0].padStart(2,'0')}`;
+                        }
+                    } else if (fechaLimpia.includes('-')) {
+                        const partes = fechaLimpia.split('-');
+                        if(partes[0].length === 4) { // Formato YYYY-MM-DD
+                            document.getElementById('fecha_registro').value = fechaLimpia;
+                        } else if(partes.length === 3) { // Formato DD-MM-YYYY
+                            document.getElementById('fecha_registro').value = `${partes[2]}-${partes[1].padStart(2,'0')}-${partes[0].padStart(2,'0')}`;
+                        }
                     }
                 }
 
@@ -324,7 +332,7 @@
             const res = await response.json();
 
             if (res.status === 'success') {
-                if (res.filas.length === 0) {
+                if (!res.filas || res.filas.length === 0) {
                     mostrarMensajeReporte('No se hallaron coincidencias para el nombre indicado.', '#5f6368');
                     document.getElementById('contenedorTablaReporte').style.display = 'none';
                     document.getElementById('btnImprimirPDF').style.display = 'none';
