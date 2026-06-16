@@ -50,19 +50,9 @@
     <h2>Registro Integrado de Ingresos</h2>
 
     <div class="search-section">
-        <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #174ea6;">Búsqueda por Análisis y Rango de Fechas</label>
+        <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #174ea6;">Consulta de Registros por Factura</label>
         <div class="form-group">
-           <input type="text" id="buscar_destino" placeholder="Buscar por Destino, No. Factura o Nombre de Cliente...">
-        </div>
-        <div class="row-inline">
-            <div class="form-group">
-                <label for="buscar_fecha_inicio">Desde:</label>
-                <input type="date" id="buscar_fecha_inicio">
-            </div>
-            <div class="form-group">
-                <label for="buscar_fecha_fin">Hasta:</label>
-                <input type="date" id="buscar_fecha_fin">
-            </div>
+           <input type="text" id="buscar_factura" placeholder="Ingresa el número exacto de factura (Ej. F-1024)...">
         </div>
         <button type="button" class="btn-search" onclick="buscarIngreso()" style="width:100%; margin-top:5px;">Ejecutar Consulta</button>
     </div>
@@ -156,7 +146,6 @@
 </div>
 
 <script>
-    // CAMBIA ESTO POR LA URL DE TU NUEVO DESPLIEGUE EN APPS SCRIPT
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYXLiGKBVqrIGrHJTmz5u6-6t3F8ZhEKsZUj_VZgEhqgOlWQU6rD6zRp4qBFDMXLymjg/exec';
 
     function calcularEstructuraCostos() {
@@ -166,15 +155,12 @@
         const descuento = parseFloat(document.getElementById('descuento').value) || 0;
         const pctImpuesto = parseFloat(document.getElementById('porcentaje_impuesto').value) || 0;
 
-        // SUBTOTAL = VALOR UNITARIO * CANTIDAD + OTRO INGRESO - DESCUENTO
         const subtotal = (vUnitario * cantidad) + otroIngreso - descuento;
         document.getElementById('subtotal').value = subtotal.toFixed(2);
 
-        // VALOR IMPUESTO = PORCENTAJE DE IMPUESTO * SUBTOTAL
         const valorImpuesto = subtotal * (pctImpuesto / 100);
         document.getElementById('valor_impuesto').value = valorImpuesto.toFixed(2);
 
-        // TOTAL INGRESO = SUBTOTAL + VALOR IMPUESTO
         const totalIngreso = subtotal + valorImpuesto;
         document.getElementById('total_ingreso').value = totalIngreso.toFixed(2);
     }
@@ -190,25 +176,25 @@
         const [year, month, day] = fechaInput.split('-');
         const fechaFormateada = `${day}/${month}/${year}`;
 
-const datos = {
-    pestaña: 'INGRESOS', // <--- Clave para separar los datos
-    accion: accion,
-    fila: filaId,
-    fecha: fechaFormateada,
-    destino: document.getElementById('destino').value,
-    factura: document.getElementById('factura').value,
-    nit: document.getElementById('nit').value,
-    cliente: document.getElementById('cliente').value,
-    descripcion: document.getElementById('descripcion').value,
-    valor_unitario: parseFloat(document.getElementById('valor_unitario').value),
-    cantidad: parseInt(document.getElementById('cantidad').value),
-    otro_ingreso: parseFloat(document.getElementById('otro_ingreso').value),
-    descuento: parseFloat(document.getElementById('descuento').value),
-    subtotal: parseFloat(document.getElementById('subtotal').value),
-    porcentaje_impuesto: parseFloat(document.getElementById('porcentaje_impuesto').value) / 100,
-    valor_impuesto: parseFloat(document.getElementById('valor_impuesto').value),
-    total_ingreso: parseFloat(document.getElementById('total_ingreso').value)
-};
+        const datos = {
+            pestaña: 'INGRESOS',
+            accion: accion,
+            fila: filaId,
+            fecha: fechaFormateada,
+            destino: document.getElementById('destino').value,
+            factura: document.getElementById('factura').value,
+            nit: document.getElementById('nit').value,
+            cliente: document.getElementById('cliente').value,
+            descripcion: document.getElementById('descripcion').value,
+            valor_unitario: parseFloat(document.getElementById('valor_unitario').value),
+            cantidad: parseInt(document.getElementById('cantidad').value),
+            otro_ingreso: parseFloat(document.getElementById('otro_ingreso').value),
+            descuento: parseFloat(document.getElementById('descuento').value),
+            subtotal: parseFloat(document.getElementById('subtotal').value),
+            porcentaje_impuesto: parseFloat(document.getElementById('porcentaje_impuesto').value) / 100,
+            valor_impuesto: parseFloat(document.getElementById('valor_impuesto').value),
+            total_ingreso: parseFloat(document.getElementById('total_ingreso').value)
+        };
 
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
@@ -225,19 +211,24 @@ const datos = {
         }
     });
 
+    // FUNCIÓN DE BÚSQUEDA CORREGIDA Y SIMPLIFICADA EXCLUSIVAMENTE PARA FACTURAS
     async function buscarIngreso() {
-        const destino = document.getElementById('buscar_destino').value;
-        const fInicio = document.getElementById('buscar_fecha_inicio').value;
-        const fFin = document.getElementById('buscar_fecha_fin').value;
+        const factura = document.getElementById('buscar_factura').value.trim();
 
-        if (!destino && !fInicio && !fFin) return alert('Especifica al menos un criterio (Destino o Rango de Fechas)');
+        if (!factura) return alert('Por favor, ingresa un número de factura para consultar.');
 
-        mostrarMensaje('Rastreando filas coincidentes...', '#1a73e8', true);
+        mostrarMensaje('Rastreando factura coincidente...', '#1a73e8', true);
 
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({ accion: 'buscar', destino_buscar: destino, fecha_inicio: fInicio, fecha_fin: fFin })
+                body: JSON.stringify({ 
+                    pestaña: 'INGRESOS',
+                    accion: 'buscar', 
+                    buscar_termino: factura, // Vinculado directamente con la variable esperada en tu script de Google
+                    fecha_inicio: null, 
+                    fecha_fin: null 
+                })
             });
 
             const res = await response.json();
@@ -272,7 +263,7 @@ const datos = {
                 document.getElementById('btnCancelar').style.display = 'block';
                 mostrarMensaje('Registro cargado con éxito para edición.', '#1aa260');
             } else {
-                mostrarMensaje('No se localizó ningún ingreso con los filtros aplicados.', '#d93025');
+                mostrarMensaje('No se localizó ningún ingreso con el número de factura suministrado.', '#d93025');
             }
         } catch (error) {
             mostrarMensaje('Error en búsqueda: ' + error.message, '#d93025');
@@ -288,7 +279,7 @@ const datos = {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify({ accion: 'editar_borrar', sub_accion: 'borrar', fila: filaId })
+                body: JSON.stringify({ pestaña: 'INGRESOS', accion: 'editar_borrar', sub_accion: 'borrar', fila: filaId })
             });
             mostrarMensaje('Registro eliminado exitosamente.', '#1aa260');
             setTimeout(resetearFormulario, 1500);
@@ -299,6 +290,7 @@ const datos = {
 
     function resetearFormulario() {
         document.getElementById('ingresosForm').reset();
+        document.getElementById('buscar_factura').value = '';
         document.getElementById('fila_id').value = '';
         document.getElementById('cantidad').value = '1';
         document.getElementById('otro_ingreso').value = '0';
