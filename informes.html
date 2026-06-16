@@ -34,7 +34,6 @@
         .btn-print { background-color: #1aa260; color: white; border: none; padding: 12px 20px; font-size: 15px; font-weight: bold; border-radius: 4px; cursor: pointer; display: none; width: 100%; margin-top: 10px; }
         .btn-print:hover { background-color: #137e49; }
 
-        /* Estilos del área del reporte */
         .report-paper {
             width: 100%; max-width: 1100px; background: white; margin: 0 auto;
             padding: 40px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -44,17 +43,15 @@
         .report-header h1 { margin: 0 0 5px 0; font-size: 26px; text-transform: uppercase; }
         .report-header p { margin: 5px 0; color: #5f6368; font-size: 14px; }
         
-        /* Contenedor de tabla responsiva/scroleable en web pero fija en impresion */
         .table-wrapper { overflow-x: auto; width: 100%; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
         th, td { border: 1px solid #bcbcbc; padding: 8px 6px; text-align: left; }
         th { background-color: #f1f3f4; font-weight: bold; color: #000; text-transform: uppercase; font-size: 11px; }
         tr:nth-child(even) { background-color: #f9f9f9; }
 
-        /* REGLAS CRÍTICAS PARA IMPRESIÓN O GUARDADO EN PDF */
         @media print {
             body { background: white; padding: 0; margin: 0; }
-            .no-print-container { display: none !important; } /* Oculta buscador y botones */
+            .no-print-container { display: none !important; } 
             .report-paper { display: block !important; box-shadow: none !important; padding: 0; max-width: 100%; }
             th { background-color: #e8eaed !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             tr:nth-child(even) { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -94,7 +91,7 @@
 <div id="reportPaper" class="report-paper">
     <div class="report-header">
         <h1 id="rep_titulo">Informe General</h1>
-        <p id="rep_fechas">Período: Completo de la Base de Datos</p>
+        <p id="rep_fechas">Período: General</p>
         <p style="font-size: 11px; font-style: italic;">Generado automáticamente el: <span id="rep_emision"></span></p>
     </div>
     
@@ -107,7 +104,7 @@
 </div>
 
 <script>
-    // Pega aquí la URL de tu Web App unificada de Google Apps Script
+    // REEMPLAZA ESTA URL CON TU WEB APP DE APPS SCRIPT ACTUALIZADA
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYXLiGKBVqrIGrHJTmz5u6-6t3F8ZhEKsZUj_VZgEhqgOlWQU6rD6zRp4qBFDMXLymjg/exec';
 
     async function procesarInforme() {
@@ -115,7 +112,6 @@
         const fInicio = document.getElementById('fecha_inicio').value;
         const fFin = document.getElementById('fecha_fin').value;
 
-        // Validar que si coloca una fecha, coloque la otra
         if ((fInicio && !fFin) || (!fInicio && fFin)) {
             return alert("Por favor define el rango completo (Fecha inicial y Fecha final).");
         }
@@ -127,6 +123,7 @@
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
+                mode: 'cors',
                 body: JSON.stringify({
                     accion: 'generar_informe',
                     tipo_reporte: tipoReporte,
@@ -138,7 +135,6 @@
             const res = await response.json();
 
             if (res && res.status === 'success') {
-                // Configurar metadatos del encabezado de la hoja
                 document.getElementById('rep_titulo').innerText = "INFORME OFICIAL DE " + tipoReporte;
                 document.getElementById('rep_emision').innerText = new Date().toLocaleString();
                 
@@ -148,7 +144,6 @@
                     document.getElementById('rep_fechas').innerText = "Período: Histórico General Completo";
                 }
 
-                // Cargar Cabeceras de la Tabla
                 const cabeceraTr = document.getElementById('tablaCabecera');
                 cabeceraTr.innerHTML = "";
                 const trHead = document.createElement('tr');
@@ -159,7 +154,6 @@
                 });
                 cabeceraTr.appendChild(trHead);
 
-                // Cargar Filas de la Tabla
                 const cuerpoTbody = document.getElementById('tablaCuerpo');
                 cuerpoTbody.innerHTML = "";
                 
@@ -175,11 +169,12 @@
                 } else {
                     res.filas.forEach(fila => {
                         const tr = document.createElement('tr');
-                        fila.forEach(celda => {
+                        fila.forEach((celda, idx) => {
                             const td = document.createElement('td');
-                            // Si es un número decimal grande, darle formato moneda visual simple
-                            if (!isNaN(celda) && celda !== "" && typeof celda === "number" && idx > 5) {
-                                td.innerText = "$ " + celda.toFixed(2);
+                            
+                            // Formato visual de moneda si detecta números en columnas de montos
+                            if (!isNaN(celda) && celda !== "" && typeof celda === "number" && idx >= 4) {
+                                td.innerText = "$ " + celda.toLocaleString('es-CO', { minimumFractionDigits: 2 });
                             } else {
                                 td.innerText = celda === null || celda === undefined ? "" : celda;
                             }
@@ -189,11 +184,8 @@
                     });
                 }
 
-                // Mostrar el papel de reporte y habilitar botón de impresión
                 document.getElementById('reportPaper').style.display = 'block';
-                document.getElementById('btnPrint').style.style.display = 'block';
-                
-                // Hacer scroll suave hacia la vista previa del reporte
+                document.getElementById('btnPrint').style.display = 'block';
                 document.getElementById('reportPaper').scrollIntoView({ behavior: 'smooth' });
 
             } else {
