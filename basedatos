@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Datos de Clientes</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-hover: #1557b0;
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #202124;
+            --border: #dadce0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg); color: var(--text);
+            margin: 0; padding: 20px; display: flex; justify-content: center;
+        }
+        .container {
+            width: 100%; max-width: 780px; background: var(--card);
+            padding: 30px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        h2 { text-align: center; color: var(--primary); margin-top: 0; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        .search-section { background: #e8f0fe; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #d2e3fc; }
+        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 5px; color: #3c4043; font-size: 14px; }
+        input { padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; }
+        input:focus { outline: none; border-color: var(--primary); }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 4px; font-size: 15px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn-save { background-color: var(--primary); color: white; }
+        .btn-save:hover { background-color: var(--primary-hover); }
+        .btn-search { background-color: #1a73e8; color: white; }
+        .btn-search:hover { background-color: #1557b0; }
+        .btn-delete { background-color: #5f6368; color: white; display: none; }
+        .btn-delete:hover { background-color: #45484a; }
+        .btn-cancel { background-color: #757575; color: white; display: none; }
+        .btn-cancel:hover { background-color: #5a5a5a; }
+        .row-inline { display: flex; gap: 15px; }
+        .row-inline .form-group { flex: 1; }
+        .status-msg { margin-top: 15px; padding: 10px; border-radius: 4px; text-align: center; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Control de Base de Datos de Clientes</h2>
+
+    <div class="search-section">
+        <label style="display:block; margin-bottom: 8px; font-weight: bold; color: #1a73e8;">Búsqueda Directa por Teléfono Principal</label>
+        <div class="form-group">
+            <input type="text" id="buscar_criterio" placeholder="Escribe el Teléfono 1 exacto del cliente a consultar...">
+        </div>
+        <button type="button" class="btn-search" onclick="buscarCliente()" style="width:100%; margin-top:5px;">Consultar Cliente</button>
+    </div>
+
+    <form id="clientesForm">
+        <input type="hidden" id="fila_id" value="">
+
+        <div class="row-inline">
+            <div class="form-group">
+                <label for="fecha_registro">Fecha de Registro:</label>
+                <input type="date" id="fecha_registro" required>
+            </div>
+            <div class="form-group">
+                <label for="nombre_completo">Nombre Completo:</label>
+                <input type="text" id="nombre_completo" required placeholder="Nombre y Apellidos del Cliente">
+            </div>
+        </div>
+
+        <div class="row-inline">
+            <div class="form-group">
+                <label for="ciudad">Ciudad:</label>
+                <input type="text" id="ciudad" required placeholder="Ej. Cali">
+            </div>
+            <div class="form-group">
+                <label for="direccion">Dirección:</label>
+                <input type="text" id="direccion" placeholder="Calle, Carrera, Barrio, Apto...">
+            </div>
+        </div>
+
+        <div class="row-inline">
+            <div class="form-group">
+                <label for="telefono_1">Teléfono 1 (Principal):</label>
+                <input type="text" id="telefono_1" required placeholder="Ej. 3176496194">
+            </div>
+            <div class="form-group">
+                <label for="telefono_2">Teléfono 2 (Opcional):</label>
+                <input type="text" id="telefono_2" placeholder="Segundo número de contacto">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="correo">Correo Electrónico:</label>
+            <input type="email" id="correo" placeholder="ejemplo@correo.com">
+        </div>
+
+        <div id="statusMsg" class="status-msg"></div>
+
+        <div class="btn-group">
+            <button type="submit" id="btnGuardar" class="btn-save">Registrar Cliente</button>
+            <button type="button" id="btnEliminar" class="btn-delete" onclick="eliminarCliente()">Eliminar Registro</button>
+            <button type="button" id="btnCancelar" class="btn-cancel" onclick="resetearFormulario()">Cancelar Edición</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // URL de tu Script Central de Apps Script
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYXLiGKBVqrIGrHJTmz5u6-6t3F8ZhEKsZUj_VZgEhqgOlWQU6rD6zRp4qBFDMXLymjg/exec';
+
+    // Establecer la fecha de hoy por defecto al cargar
+    window.addEventListener('DOMContentLoaded', () => {
+        const hoy = new Date().toISOString().split('T')[0];
+        document.getElementById('fecha_registro').value = hoy;
+    });
+
+    // Evento para Registrar / Editar Cliente
+    document.getElementById('clientesForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        mostrarMensaje('Sincronizando información de cliente...', '#ffc107', true);
+
+        const filaId = document.getElementById('fila_id').value;
+        const accion = filaId ? 'editar_borrar' : 'insertar';
+
+        const fechaInput = document.getElementById('fecha_registro').value;
+        const [year, month, day] = fechaInput.split('-');
+        const fechaFormateada = `${day}/${month}/${year}`;
+
+        // El orden de estas variables debe emparejar con el backend o procesarse por llaves de objeto
+        const datos = {
+            pestaña: 'BASE DE DATOS',
+            accion: accion,
+            fila: filaId,
+            fecha_registro: fechaFormateada,
+            nombre_completo: document.getElementById('nombre_completo').value,
+            ciudad: document.getElementById('ciudad').value,
+            direccion: document.getElementById('direccion').value,
+            telefono_1: document.getElementById('telefono_1').value,
+            telefono_2: document.getElementById('telefono_2').value,
+            correo: document.getElementById('correo').value
+        };
+
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+
+            mostrarMensaje('¡Operación de cliente ejecutada exitosamente!', '#1aa260');
+            setTimeout(resetearFormulario, 1500);
+        } catch (error) {
+            mostrarMensaje('Error de enlace: ' + error.message, '#d93025');
+        }
+    });
+
+    // Función para buscar cliente por su teléfono principal
+    async function buscarCliente() {
+        const criterio = document.getElementById('buscar_criterio').value.trim();
+
+        if (!criterio) return alert('Por favor digite un número de Teléfono para buscar.');
+
+        mostrarMensaje('Buscando cliente en el sistema...', '#1a73e8', true);
+
+        try {
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ pestaña: 'BASE DE DATOS', accion: 'buscar', buscar_termino: criterio })
+            });
+
+            const res = await response.json();
+
+            if (res && res.status === 'found') {
+                document.getElementById('fila_id').value = res.fila;
+                document.getElementById('nombre_completo').value = res.nombre_completo || '';
+                document.getElementById('ciudad').value = res.ciudad || '';
+                document.getElementById('direccion').value = res.direccion || '';
+                document.getElementById('telefono_1').value = res.telefono_1 || '';
+                document.getElementById('telefono_2').value = res.telefono_2 || '';
+                document.getElementById('correo').value = res.correo || '';
+
+                if (res.fecha_registro) {
+                    const partes = res.fecha_registro.split('T')[0].split('/');
+                    if(partes.length === 3) {
+                        document.getElementById('fecha_registro').value = `${partes[2]}-${partes[1].padStart(2,'0')}-${partes[0].padStart(2,'0')}`;
+                    }
+                }
+
+                document.getElementById('btnGuardar').innerText = 'Actualizar Datos';
+                document.getElementById('btnEliminar').style.display = 'block';
+                document.getElementById('btnCancelar').style.display = 'block';
+                mostrarMensaje('Ficha del cliente localizada y lista para edición.', '#1aa260');
+            } else {
+                mostrarMensaje('No se encontró ningún cliente registrado con ese teléfono.', '#d93025');
+            }
+        } catch (error) {
+            mostrarMensaje('Error en motor de búsqueda: ' + error.message, '#d93025');
+        }
+    }
+
+    // Función para borrar registro
+    async function eliminarCliente() {
+        if (!confirm('¿Está completamente seguro de eliminar este registro de cliente?')) return;
+        const filaId = document.getElementById('fila_id').value;
+        mostrarMensaje('Removiendo cliente de la base de datos...', '#d93025', true);
+
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ pestaña: 'BASE DE DATOS', accion: 'editar_borrar', sub_accion: 'borrar', fila: filaId })
+            });
+            mostrarMensaje('Registro eliminado correctamente.', '#1aa260');
+            setTimeout(resetearFormulario, 1500);
+        } catch (error) {
+            mostrarMensaje('Error al intentar borrar: ' + error.message, '#d93025');
+        }
+    }
+
+    // Resetear formulario a su estado por defecto
+    function resetearFormulario() {
+        document.getElementById('clientesForm').reset();
+        document.getElementById('fila_id').value = '';
+        const hoy = new Date().toISOString().split('T')[0];
+        document.getElementById('fecha_registro').value = hoy;
+        document.getElementById('btnGuardar').innerText = 'Registrar Cliente';
+        document.getElementById('btnEliminar').style.display = 'none';
+        document.getElementById('btnCancelar').style.display = 'none';
+        document.getElementById('statusMsg').style.display = 'none';
+    }
+
+    // Controlador de avisos en pantalla
+    function mostrarMensaje(texto, color, permanente = false) {
+        const msg = document.getElementById('statusMsg');
+        msg.style.display = 'block';
+        msg.style.backgroundColor = color;
+        msg.style.color = 'white';
+        msg.innerText = texto;
+        if (!permanente) {
+            setTimeout(() => { msg.style.display = 'none'; }, 4000);
+        }
+    }
+</script>
+</body>
+</html>
