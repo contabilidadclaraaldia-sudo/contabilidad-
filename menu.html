@@ -163,20 +163,20 @@
 </body>
 </html>
 <!-- === COPIAR DESDE AQUÍ === -->
-<!-- Pie de página integrado con estilos inline para fijarlo abajo y centrarlo -->
 <div style="
-    display: block; /* Asegura que ocupe todo el ancho */
+    display: block; 
+    clear: both; /* IMPORTANTE: Rompe el flujo flotante y obliga a ir abajo del contenedor blanco */
     width: 100%;
-    margin-top: 50px; /* Margen superior para separarlo del formulario */
-    padding: 20px 0;
-    text-align: center; /* Centra el contenido horizontalmente */
-    font-family: Arial, sans-serif; /* Tipografía limpia */
+    margin-top: 50px; 
+    padding: 30px 0;
+    text-align: center; 
+    font-family: Arial, sans-serif; 
     color: #333;
-    border-top: 1px solid #eaeaea; /* Línea divisoria suave opcional */
+    border-top: 1px solid #eaeaea;
 ">
     <p style="
         font-size: 16px;
-        margin-bottom: 5px; /* Espacio inferior */
+        margin-bottom: 5px;
     ">
         Este es un desarrollo creado por <strong style="text-decoration: underline;">Surtecol</strong>
     </p>
@@ -185,23 +185,20 @@
         font-weight: bold;
         margin-top: 0;
     ">
-        Tel.: +573188097131 &nbsp;&nbsp;|&nbsp;&nbsp; email: surtecol@gmail.com;&nbsp;&nbsp|&nbsp;&nbsp;Cali- Colombia
+        Tel.: +573188097131 &nbsp;&nbsp;|&nbsp;&nbsp; email: surtecol@gmail.com &nbsp;&nbsp;|&nbsp;&nbsp; Cali - Colombia
     </p>
 
-    <!-- Contenedor del Logo (Centrado) -->
     <div style="
         display: block;
         margin-top: 15px;
     ">
-        <!-- *** IMPORTANTE: REEMPLAZA ESTA RUTA *** -->
-        <img src="https://drive.google.com/file/d/1BkztgR8lDo-p7sZ3fBSyNTozDn9848hr/view?usp=drive_link"
+        <img src="https://thumbnail.image.as/v2/https%3A%2F%2Fdrive.google.com%2Fuc%3Fexport%3Dview%26id%3D1BkztgR8lDo-p7sZ3fBSyNTozDn9848hr"
              alt="Logo Surtecol"
              style="
-                 width: 60px; /* Ancho del logo, ajusta según lo requieras */
+                 width: 80px; /* Tamaño ajustado para que se aprecie mejor */
                  height: auto;
-                 display: inline-block; /* Centrado dentro de text-align: center */
+                 display: inline-block; 
                  margin: 0 auto;
              " />
     </div>
 </div>
-<!-- === HASTA AQUÍ === -->
