@@ -26,11 +26,13 @@
             background-color: var(--bg);
             color: var(--text-main);
             margin: 0;
-            padding: 0;
+            padding: 40px 0; /* Espacio arriba y abajo en la pantalla */
             display: flex;
+            flex-direction: column; /* Obliga a que todo se alinee verticalmente de arriba a abajo */
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
         }
 
         .menu-container {
@@ -42,7 +44,7 @@
             box-shadow: 0 4px 16px rgba(0,0,0,0.08);
             text-align: center;
             box-sizing: border-box;
-            margin: 20px;
+            margin: 0 auto 20px auto; /* Centrado horizontal y margen inferior */
         }
 
         h1 {
@@ -89,31 +91,14 @@
         }
 
         /* Asignación de colores específicos */
-        .btn-presupuesto {
-            background-color: var(--color-presupuesto);
-        }
+        .btn-presupuesto { background-color: var(--color-presupuesto); }
+        .btn-ingresos { background-color: var(--color-ingresos); }
+        .btn-egresos { background-color: var(--color-egresos); }
+        .btn-informes { background-color: var(--color-informes); }
+        .btn-ejercicio { background-color: var(--color-ejercicio); }
+        .btn-basedatos { background-color: var(--color-basedatos); }
 
-        .btn-ingresos {
-            background-color: var(--color-ingresos);
-        }
-
-        .btn-egresos {
-            background-color: var(--color-egresos);
-        }
-
-        .btn-informes {
-            background-color: var(--color-informes);
-        }
-
-        .btn-ejercicio {
-            background-color: var(--color-ejercicio);
-        }
-
-        .btn-basedatos {
-            background-color: var(--color-basedatos);
-        }
-
-        /* Footer discreto */
+        /* Footer discreto original del contenedor */
         .footer-credit {
             margin-top: 35px;
             font-size: 11px;
@@ -121,10 +106,36 @@
             border-top: 1px solid var(--border);
             padding-top: 15px;
         }
+
+        /* === NUEVOS ESTILOS PARA TU PIE DE PÁGINA CENTRADO === */
+        .surtecol-footer {
+            width: 100%;
+            max-width: 500px; /* Alínea el ancho con el contenedor del formulario */
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            box-sizing: border-box;
+        }
+
+        .surtecol-footer p {
+            margin: 5px 0;
+            color: #000000;
+        }
+
+        .surtecol-logo-container {
+            margin-top: 15px;
+        }
+
+        .surtecol-logo-container img {
+            width: 70px;
+            height: auto;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
 
+<!-- Contenedor Principal del Formulario -->
 <div class="menu-container">
     <h1>Sistema de Gestión Financiera</h1>
     <p class="subtitle">Selecciona el módulo contable que deseas operar:</p>
@@ -160,45 +171,19 @@
     </div>
 </div>
 
-</body>
-</html>
-<!-- === COPIAR DESDE AQUÍ === -->
-<div style="
-    display: block; 
-    clear: both; /* IMPORTANTE: Rompe el flujo flotante y obliga a ir abajo del contenedor blanco */
-    width: 100%;
-    margin-top: 50px; 
-    padding: 30px 0;
-    text-align: center; 
-    font-family: Arial, sans-serif; 
-    color: #333;
-    border-top: 1px solid #eaeaea;
-">
-    <p style="
-        font-size: 16px;
-        margin-bottom: 5px;
-    ">
+<!-- Pie de página de Surtecol perfectamente posicionado abajo y centrado -->
+<div class="surtecol-footer">
+    <p style="font-size: 16px;">
         Este es un desarrollo creado por <strong style="text-decoration: underline;">Surtecol</strong>
     </p>
-    <p style="
-        font-size: 15px;
-        font-weight: bold;
-        margin-top: 0;
-    ">
+    <p style="font-size: 15px; font-weight: bold;">
         Tel.: +573188097131 &nbsp;&nbsp;|&nbsp;&nbsp; email: surtecol@gmail.com &nbsp;&nbsp;|&nbsp;&nbsp; Cali - Colombia
     </p>
-
-    <div style="
-        display: block;
-        margin-top: 15px;
-    ">
-        <img src="https://thumbnail.image.as/v2/https%3A%2F%2Fdrive.google.com%2Fuc%3Fexport%3Dview%26id%3D1BkztgR8lDo-p7sZ3fBSyNTozDn9848hr"
-             alt="Logo Surtecol"
-             style="
-                 width: 80px; /* Tamaño ajustado para que se aprecie mejor */
-                 height: auto;
-                 display: inline-block; 
-                 margin: 0 auto;
-             " />
+    <div class="surtecol-logo-container">
+        <!-- Enlace de render directo compatible con Google Drive público -->
+        <img src="https://docs.google.com/uc?export=view&id=1BkztgR8lDo-p7sZ3fBSyNTozDn9848hr" alt="Logo Surtecol" />
     </div>
 </div>
+
+</body>
+</html>
