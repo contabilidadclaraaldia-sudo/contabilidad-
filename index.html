@@ -18,9 +18,12 @@
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 20px;
+            padding: 40px 20px; /* Incrementado para dar aire arriba y abajo */
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Alineación vertical de arriba hacia abajo */
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
         .container {
             width: 100%;
@@ -29,6 +32,8 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            margin-bottom: 20px; /* Separación respecto al pie de página */
         }
         h2 {
             text-align: center;
@@ -107,12 +112,34 @@
             font-weight: bold;
             display: none;
         }
+
+        /* === ESTILOS PARA EL PIE DE PÁGINA CENTRADO DE SURTECOL === */
+        .surtecol-footer {
+            width: 100%;
+            max-width: 700px; /* Ajustado al mismo ancho máximo del contenedor del formulario */
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            box-sizing: border-box;
+        }
+        .surtecol-footer p {
+            margin: 5px 0;
+            color: #000000;
+        }
+        .surtecol-logo-container {
+            margin-top: 15px;
+        }
+        .surtecol-logo-container img {
+            width: 80px;
+            height: auto;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Control de Presupuestos </h2>
+    <h2>Control de Presupuestos</h2>
 
     <div class="search-section">
         <div class="form-group" style="margin-bottom: 0;">
@@ -164,9 +191,22 @@
         <div class="btn-group">
             <button type="submit" id="btnGuardar" class="btn-save">Guardar Registro</button>
             <button type="button" id="btnEliminar" class="btn-delete" onclick="eliminarRegistro()">Borrar</button>
-            <button type="button" id="btnCancelar" class="btn-cancel" onclick="resetearFormulario()">Cancelar Edición</button>
+            <button type="button" id="btnCancelar" class="btn-cancel" onclick="resetearFormulario()">Cancel Edición</button>
         </div>
     </form>
+</div>
+
+<!-- Pie de página de Surtecol perfectamente posicionado abajo y centrado -->
+<div class="surtecol-footer">
+    <p style="font-size: 16px;">
+        Este es un desarrollo creado por <strong style="text-decoration: underline;">Surtecol</strong>
+    </p>
+    <p style="font-size: 15px; font-weight: bold;">
+        Tel.: +573188097131 &nbsp;&nbsp;|&nbsp;&nbsp; email: surtecol@gmail.com &nbsp;&nbsp;|&nbsp;&nbsp; Colombia
+    </p>
+    <div class="surtecol-logo-container">
+        <img src="logo1.png?v=2" alt="Logo Surtecol" onerror="this.src='logo1.PNG?v=2'" />
+    </div>
 </div>
 
 <script>
@@ -199,20 +239,19 @@
         const [year, month, day] = fechaInput.split('-');
         const fechaFormateada = `${day}/${month}/${year}`;
 
-const datos = {
-    pestaña: 'PRESUPUESTOS', // <--- Clave para no borrar nada
-    accion: accion,
-    fila: filaId,
-    destino: document.getElementById('destino').value,
-    fecha: fechaFormateada,
-    descripcion: document.getElementById('descripcion').value,
-    costos: parseFloat(document.getElementById('costos').value),
-    margen: parseFloat(document.getElementById('margen').value) / 100,
-    cobro: parseFloat(document.getElementById('cobro').value)
-};
+        const datos = {
+            pestaña: 'PRESUPUESTOS',
+            accion: accion,
+            fila: filaId,
+            destino: document.getElementById('destino').value,
+            fecha: fechaFormateada,
+            descripcion: document.getElementById('descripcion').value,
+            costos: parseFloat(document.getElementById('costos').value),
+            margen: parseFloat(document.getElementById('margen').value) / 100,
+            cobro: parseFloat(document.getElementById('cobro').value)
+        };
 
         try {
-            // Envío vía POST plano para evitar bloqueos estrictos de CORS con Apps Script
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors', 
@@ -220,7 +259,6 @@ const datos = {
                 body: JSON.stringify(datos)
             });
 
-            // Al usar 'no-cors' la respuesta es opaca, asumimos éxito si no salta al catch
             mostrarMensaje('¡Operación procesada con éxito en la Hoja!', '#28a745');
             setTimeout(resetearFormulario, 1500);
 
@@ -249,20 +287,16 @@ const datos = {
                 document.getElementById('destino').value = resultado.destino;
                 document.getElementById('descripcion').value = resultado.descripcion;
                 
-                // Sanitizar valores numéricos que Sheets devuelva con formatos de moneda o porcentaje
                 const costoLimpio = String(resultado.costos).replace(/[^0-9.-]/g, "");
                 const margenLimpio = String(resultado.margen).replace(/[^0-9.-]/g, "");
                 
                 document.getElementById('costos').value = parseFloat(costoLimpio) || 0;
-                // Si viene como 0.2 en decimal, lo multiplicamos por 100 para el input de porcentaje
                 document.getElementById('margen').value = (parseFloat(margenLimpio) < 1 ? parseFloat(margenLimpio) * 100 : parseFloat(margenLimpio)) || 0;
 
-                // Formatear fecha para el input date (vienen como DD/MM/AAAA u objeto Fecha)
                 if(resultado.fecha) {
-                    const fechaStr = resultado.fecha.split('T')[0]; // Por si viene con hora
+                    const fechaStr = resultado.fecha.split('T')[0];
                     const partes = fechaStr.includes('/') ? fechaStr.split('/') : fechaStr.split('-');
                     if(partes.length === 3) {
-                        // Detectar si el año está al inicio o al final
                         const a = partes[0].length === 4 ? partes[0] : partes[2];
                         const m = partes[0].length === 4 ? partes[1] : partes[1];
                         const d = partes[0].length === 4 ? partes[2] : partes[0];
