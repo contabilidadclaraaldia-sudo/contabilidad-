@@ -17,7 +17,11 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg); color: var(--text);
-            margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center;
+            margin: 0; padding: 40px 20px; /* Incrementado padding para dar aire visual */
+            display: flex; flex-direction: column; 
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
         .container {
             width: 100%; max-width: 780px; background: var(--card);
@@ -53,6 +57,28 @@
         .btn-report:hover { background-color: #1557b0; }
         .btn-pdf { background-color: #e52521; color: white; margin-top: 15px; display: none; }
         .btn-pdf:hover { background-color: #b31412; }
+
+        /* === ESTILOS PARA EL PIE DE PÁGINA CENTRADO DE SURTECOL === */
+        .surtecol-footer {
+            width: 100%;
+            max-width: 780px; /* Alineado perfectamente al ancho del contenedor */
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            box-sizing: border-box;
+        }
+        .surtecol-footer p {
+            margin: 5px 0;
+            color: #000000;
+        }
+        .surtecol-logo-container {
+            margin-top: 15px;
+        }
+        .surtecol-logo-container img {
+            width: 80px;
+            height: auto;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -159,6 +185,18 @@
     </div>
     
     <button type="button" id="btnImprimirPDF" class="btn-pdf" onclick="imprimirReportePDF()">Imprimir o Guardar en PDF</button>
+</div>
+
+<div class="surtecol-footer">
+    <p style="font-size: 16px;">
+        Este es un desarrollo creado por <strong style="text-decoration: underline;">Surtecol</strong>
+    </p>
+    <p style="font-size: 15px; font-weight: bold;">
+        Tel.: +573188097131 &nbsp;&nbsp;|&nbsp;&nbsp; email: surtecol@gmail.com &nbsp;&nbsp;|&nbsp;&nbsp; Colombia
+    </p>
+    <div class="surtecol-logo-container">
+        <img src="logo1.png?v=2" alt="Logo Surtecol" onerror="this.src='logo1.PNG?v=2'" />
+    </div>
 </div>
 
 <script>
