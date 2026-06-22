@@ -162,47 +162,46 @@
 
 </body>
 </html>
-<!-- Pie de página integrado -->
-<div class="footer-desarrollo">
-    <p class="linea-autor">Este es un desarrollo creado por <strong>Surtecol</strong></p>
-    <p class="linea-contacto">Tel.: 3188097131 &nbsp;|&nbsp; email: surtecol@gmail.com</p>
-    
-    <!-- Espacio para el logo circular que aparece abajo -->
-    <div class="logo-footer">
-        <img src="https://drive.google.com/file/d/1BkztgR8lDo-p7sZ3fBSyNTozDn9848hr/view?usp=drive_link" alt="Logo Surtecol" />
-    </div>
-</div>
-
-<style>
-    .footer-desarrollo {
-        text-align: center;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Tipografía limpia similar a la de la imagen */
-        margin-top: 30px;
-        padding: 20px 0;
-        color: #000000;
-    }
-
-    .linea-autor {
+<!-- === COPIAR DESDE AQUÍ === -->
+<!-- Pie de página integrado con estilos inline para fijarlo abajo y centrarlo -->
+<div style="
+    display: block; /* Asegura que ocupe todo el ancho */
+    width: 100%;
+    margin-top: 50px; /* Margen superior para separarlo del formulario */
+    padding: 20px 0;
+    text-align: center; /* Centra el contenido horizontalmente */
+    font-family: Arial, sans-serif; /* Tipografía limpia */
+    color: #333;
+    border-top: 1px solid #eaeaea; /* Línea divisoria suave opcional */
+">
+    <p style="
         font-size: 16px;
-        margin-bottom: 5px;
-    }
-
-    .linea-autor strong {
-        font-weight: bold;
-        text-decoration: underline; /* Agrega la línea roja/subrayado si es necesario, o solo negrita */
-    }
-
-    .linea-contacto {
+        margin-bottom: 5px; /* Espacio inferior */
+    ">
+        Este es un desarrollo creado por <strong style="text-decoration: underline;">Surtecol</strong>
+    </p>
+    <p style="
         font-size: 15px;
         font-weight: bold;
         margin-top: 0;
-        margin-bottom: 15px;
-    }
+    ">
+        Tel.: 3188097131 &nbsp;&nbsp;|&nbsp;&nbsp; email: surtecol@gmail.com
+    </p>
 
-    .logo-footer img {
-        width: 60px; /* Ajusta el tamaño de tu logo circular según lo requieras */
-        height: auto;
+    <!-- Contenedor del Logo (Centrado) -->
+    <div style="
         display: block;
-        margin: 0 auto;
-    }
-</style>
+        margin-top: 15px;
+    ">
+        <!-- *** IMPORTANTE: REEMPLAZA ESTA RUTA *** -->
+        <img src="https://drive.google.com/file/d/1BkztgR8lDo-p7sZ3fBSyNTozDn9848hr/view?usp=drive_link"
+             alt="Logo Surtecol"
+             style="
+                 width: 60px; /* Ancho del logo, ajusta según lo requieras */
+                 height: auto;
+                 display: inline-block; /* Centrado dentro de text-align: center */
+                 margin: 0 auto;
+             " />
+    </div>
+</div>
+<!-- === HASTA AQUÍ === -->
