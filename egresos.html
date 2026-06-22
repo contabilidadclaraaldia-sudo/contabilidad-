@@ -16,11 +16,17 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg); color: var(--text);
-            margin: 0; padding: 20px; display: flex; justify-content: center;
+            margin: 0; padding: 40px 20px; /* Incrementado padding para dar aire visual */
+            display: flex; flex-direction: column; /* Alineación de arriba hacia abajo */
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
         .container {
             width: 100%; max-width: 780px; background: var(--card);
             padding: 30px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            box-sizing: border-box;
+            margin-bottom: 20px; /* Separación respecto al pie de página */
         }
         h2 { text-align: center; color: var(--primary); margin-top: 0; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
         .search-section { background: #fce8e6; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #fad2cf; }
@@ -42,6 +48,28 @@
         .row-inline { display: flex; gap: 15px; }
         .row-inline .form-group { flex: 1; }
         .status-msg { margin-top: 15px; padding: 10px; border-radius: 4px; text-align: center; font-weight: bold; display: none; }
+
+        /* === ESTILOS PARA EL PIE DE PÁGINA CENTRADO DE SURTECOL === */
+        .surtecol-footer {
+            width: 100%;
+            max-width: 780px; /* Ajustado exactamente al ancho máximo del contenedor de egresos */
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            box-sizing: border-box;
+        }
+        .surtecol-footer p {
+            margin: 5px 0;
+            color: #000000;
+        }
+        .surtecol-logo-container {
+            margin-top: 15px;
+        }
+        .surtecol-logo-container img {
+            width: 80px;
+            height: auto;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -131,6 +159,18 @@
             <button type="button" id="btnCancelar" class="btn-cancel" onclick="resetearFormulario()">Cancelar Edición</button>
         </div>
     </form>
+</div>
+
+<div class="surtecol-footer">
+    <p style="font-size: 16px;">
+        Este es un desarrollo creado por <strong style="text-decoration: underline;">Surtecol</strong>
+    </p>
+    <p style="font-size: 15px; font-weight: bold;">
+        Tel.: +573188097131 &nbsp;&nbsp;|&nbsp;&nbsp; email: surtecol@gmail.com &nbsp;&nbsp;|&nbsp;&nbsp; Colombia
+    </p>
+    <div class="surtecol-logo-container">
+        <img src="logo1.png?v=2" alt="Logo Surtecol" onerror="this.src='logo1.PNG?v=2'" />
+    </div>
 </div>
 
 <script>
