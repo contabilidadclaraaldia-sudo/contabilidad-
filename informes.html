@@ -14,8 +14,13 @@
         }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: var(--bg); margin: 0; padding: 20px;
+            background-color: var(--bg); margin: 0; padding: 40px 20px; /* Ajuste de padding general */
             color: #202124;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
         .no-print-container {
             width: 100%; max-width: 900px; background: var(--card);
@@ -35,7 +40,7 @@
         .btn-print:hover { background-color: #137e49; }
 
         .report-paper {
-            width: 100%; max-width: 1100px; background: white; margin: 0 auto;
+            width: 100%; max-width: 1100px; background: white; margin: 0 auto 25px auto;
             padding: 40px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             box-sizing: border-box; display: none;
         }
@@ -49,9 +54,31 @@
         th { background-color: #f1f3f4; font-weight: bold; color: #000; text-transform: uppercase; font-size: 11px; }
         tr:nth-child(even) { background-color: #f9f9f9; }
 
+        /* === ESTILOS PARA EL PIE DE PÁGINA CENTRADO DE SURTECOL === */
+        .surtecol-footer {
+            width: 100%;
+            max-width: 900px; /* Alineado al ancho del primer bloque no-print */
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            box-sizing: border-box;
+        }
+        .surtecol-footer p {
+            margin: 5px 0;
+            color: #000000;
+        }
+        .surtecol-logo-container {
+            margin-top: 15px;
+        }
+        .surtecol-logo-container img {
+            width: 80px;
+            height: auto;
+            display: inline-block;
+        }
+
         @media print {
             body { background: white; padding: 0; margin: 0; }
-            .no-print-container { display: none !important; } 
+            .no-print-container, .surtecol-footer { display: none !important; } /* Oculta controles y footer de pantalla en el papel */
             .report-paper { display: block !important; box-shadow: none !important; padding: 0; max-width: 100%; }
             th { background-color: #e8eaed !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             tr:nth-child(even) { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -103,8 +130,19 @@
     </div>
 </div>
 
+<div class="surtecol-footer">
+    <p style="font-size: 16px;">
+        Este es un desarrollo creado por <strong style="text-decoration: underline;">Surtecol</strong>
+    </p>
+    <p style="font-size: 15px; font-weight: bold;">
+        Tel.: +573188097131 &nbsp;&nbsp;|&nbsp;&nbsp; email: surtecol@gmail.com &nbsp;&nbsp;|&nbsp;&nbsp; Colombia
+    </p>
+    <div class="surtecol-logo-container">
+        <img src="logo1.png?v=2" alt="Logo Surtecol" onerror="this.src='logo1.PNG?v=2'" />
+    </div>
+</div>
+
 <script>
-    // REEMPLAZA ESTA URL CON TU WEB APP DE APPS SCRIPT ACTUALIZADA
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYXLiGKBVqrIGrHJTmz5u6-6t3F8ZhEKsZUj_VZgEhqgOlWQU6rD6zRp4qBFDMXLymjg/exec';
 
     async function procesarInforme() {
