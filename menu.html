@@ -33,6 +33,30 @@
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
+            position: relative;
+        }
+
+        /* === CONTENEDOR DE DATOS - CENTRADO === */
+        .info-header {
+            width: 100%;
+            max-width: 500px;
+            text-align: center; /* Alineación centrada con respecto al menú */
+            margin: 0 auto 15px auto;
+            box-sizing: border-box;
+        }
+
+        .info-header .razon-social {
+            font-size: 26px;
+            font-weight: bold;
+            color: #000000;
+            margin: 0 0 8px 0;
+        }
+
+        .info-header .fecha-actual {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+            margin: 0;
         }
 
         .menu-container {
@@ -135,6 +159,11 @@
 </head>
 <body>
 
+<div class="info-header">
+    <div class="razon-social" id="razonSocialLabel">Cargando...</div>
+    <div class="fecha-actual" id="fechaLabel">--/--/----</div>
+</div>
+
 <div class="menu-container">
     <h1>Sistema de Gestión Financiera</h1>
     <p class="subtitle">Selecciona el módulo contable que deseas operar:</p>
@@ -181,6 +210,50 @@
         <img src="logo1.png?v=2" alt="Logo Surtecol" onerror="this.src='logo1.PNG?v=2'" />
     </div>
 </div>
+
+<script>
+    // 1. LÓGICA PARA OBTENER LA RAZÓN SOCIAL DESDE LA NUEVA HOJA DE CÁLCULO (CELDA B3)
+    async function obtenerRazonSocial() {
+        // ID correspondiente a la nueva url proporcionada
+        const spreadsheetId = '1mgAD1yKD-PSemNbhuc6TlqrmLyPWPk8eSsEIXqn_v_g';
+        const gid = '1296639800';
+        const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&id=${spreadsheetId}&gid=${gid}&range=B3`;
+
+        try {
+            const respuesta = await fetch(url);
+            if (!respuesta.ok) throw new Error('Error al conectar con la hoja de cálculo');
+            const texto = await respuesta.text();
+            
+            // Limpieza de formato CSV
+            const razonSocial = texto.replace(/^"|"$/g, '').trim();
+            
+            if (razonSocial) {
+                document.getElementById('razonSocialLabel').textContent = razonSocial;
+            } else {
+                document.getElementById('razonSocialLabel').textContent = 'Surtecol S.A';
+            }
+        } catch (error) {
+            console.error('Error obteniendo la Razón Social:', error);
+            document.getElementById('razonSocialLabel').textContent = 'Surtecol S.A';
+        }
+    }
+
+    // 2. LÓGICA PARA LA FECHA ACTUALIZADA AUTOMÁTICAMENTE
+    function establecerFechaActual() {
+        const hoy = new Date();
+        const dia = String(hoy.getDate()).padStart(2, '0');
+        const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+        const anio = hoy.getFullYear();
+        
+        document.getElementById('fechaLabel').textContent = `${dia}/${mes}/${anio}`;
+    }
+
+    // Inicializar funciones al cargar el DOM
+    window.addEventListener('DOMContentLoaded', () => {
+        establecerFechaActual();
+        obtenerRazonSocial();
+    });
+</script>
 
 </body>
 </html>
