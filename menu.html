@@ -50,6 +50,7 @@
             font-weight: bold;
             color: #000000;
             margin: 0 0 8px 0;
+            min-height: 35px; /* Evita saltos de maquetación mientras carga */
         }
 
         .info-header .fecha-actual {
@@ -159,6 +160,7 @@
 </head>
 <body>
 
+<!-- Bloque de información centrado -->
 <div class="info-header">
     <div class="razon-social" id="razonSocialLabel">Cargando...</div>
     <div class="fecha-actual" id="fechaLabel">--/--/----</div>
@@ -212,29 +214,29 @@
 </div>
 
 <script>
-    // 1. LÓGICA PARA OBTENER LA RAZÓN SOCIAL DESDE LA NUEVA HOJA DE CÁLCULO (CELDA B3)
+    // 1. LÓGICA CORREGIDA PARA OBTENER LA RAZÓN SOCIAL DESDE LA NUEVA HOJA DE CÁLCULO
     async function obtenerRazonSocial() {
-        // ID correspondiente a la nueva url proporcionada
         const spreadsheetId = '1mgAD1yKD-PSemNbhuc6TlqrmLyPWPk8eSsEIXqn_v_g';
         const gid = '1296639800';
         const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&id=${spreadsheetId}&gid=${gid}&range=B3`;
 
         try {
             const respuesta = await fetch(url);
-            if (!respuesta.ok) throw new Error('Error al conectar con la hoja de cálculo');
+            if (!respuesta.ok) throw new Error('Error de conexión');
             const texto = await respuesta.text();
             
-            // Limpieza de formato CSV
+            // Eliminar comillas dobles que agrega la exportación CSV de Google Sheets
             const razonSocial = texto.replace(/^"|"$/g, '').trim();
             
-            if (razonSocial) {
+            if (razonSocial && razonSocial !== "") {
                 document.getElementById('razonSocialLabel').textContent = razonSocial;
             } else {
-                document.getElementById('razonSocialLabel').textContent = 'Surtecol S.A';
+                document.getElementById('razonSocialLabel').textContent = 'Paso Libre Treak';
             }
         } catch (error) {
             console.error('Error obteniendo la Razón Social:', error);
-            document.getElementById('razonSocialLabel').textContent = 'Surtecol S.A';
+            // Fallback correcto con el nombre de la nueva empresa reflejada en la imagen_26d5c4.png
+            document.getElementById('razonSocialLabel').textContent = 'Paso Libre Treak';
         }
     }
 
